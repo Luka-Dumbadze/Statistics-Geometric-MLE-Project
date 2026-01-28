@@ -29,7 +29,7 @@
   #v(1.5cm)
   
   #text(size: 14pt)[
-    *Student:* [Your Name]\
+    *Student:* Luka Dumabdze & Ivane Urjumelashvili\
     *Date:* January 28, 2026
   ]
   
