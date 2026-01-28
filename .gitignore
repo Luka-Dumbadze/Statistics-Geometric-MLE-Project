@@ -1,7 +1,9 @@
+cat > .gitignore <<EOF
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
-.Rproj.user
-.Rhistory
-.RData
+.DS_Store
+*.log
+*.aux
+EOF

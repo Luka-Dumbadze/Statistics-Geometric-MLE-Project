@@ -1,20 +1,35 @@
-# Statistical Inference and Analysis Project
-**Course:** Probability & Statistics (Fall 2025)
+cat > README.md <<EOF
+# Statistical Inference: Geometric Distribution Analysis
 
-## Overview
-This project demonstrates three core statistical concepts:
-1. **Analytical Derivation:** Deriving the Maximum Likelihood Estimator (MLE) for the Geometric Distribution.
-2. **Computational Simulation:** Verifying the MLE using Monte Carlo simulations and the Inverse Transform Method in R.
-3. **Data Analysis:** Performing hypothesis testing (t-test) on real-world server traffic data ('ConcurrentUsers.csv').
+## 📌 Overview
+This project explores the **Geometric Distribution** through analytical derivation, computational simulation, and applied data analysis. It demonstrates the properties of Maximum Likelihood Estimators (MLE) and applies statistical inference to real-world server traffic data.
 
-## Technologies
-* **Language:** R (v4.3.3)
-* **Libraries:** Base R
-* **Tools:** Typst (for report generation)
+## 📂 Project Structure
 
-## Contents
-* `PART 1...R`: Logic for Log-Likelihood and MLE.
-* `PART 2...R`: Geometric distribution simulation algorithms.
-* `PART 3...R`: T-tests and boxplots for data analysis.
-* `ConcurrentUsers.csv`: Dataset.
-* `Report.pdf`: Final submission.
+### **1. Analytic Derivation**
+*   **File:** \`01_mle_derivation.R\`
+*   **Goal:** Derive and visualize the Log-Likelihood function.
+*   **Outcome:** Proved analytically and computationally that the MLE for $p$ is the reciprocal of the sample mean ($1/\\bar{x}$).
+
+### **2. Computational Verification**
+*   **File:** \`02_simulation.R\`
+*   **Goal:** Verify consistency using the **Inverse Transform Method**.
+*   **Outcome:** Implemented a custom simulation algorithm (without using \`rgeom\`) and demonstrated the convergence of the estimator as $n \\to \\infty$ (Law of Large Numbers).
+
+### **3. Data Analysis**
+*   **File:** \`03_data_analysis.R\`
+*   **Data:** \`ConcurrentUsers.csv\`
+*   **Goal:** Perform statistical inference on server user counts.
+*   **Outcome:** Verified normality assumptions (Shapiro-Wilk) and performed a one-sample t-test ($p < 0.001$), confirming average traffic exceeds the baseline.
+
+## 🛠️ Tools Used
+*   **R (v4.3.3):** Core statistical computing.
+*   **ggplot2:** Advanced data visualization.
+*   **Typst:** Scientific typesetting for the final report.
+
+## 📄 Final Report
+The complete analysis and mathematical proofs can be found in [final_report.pdf](./final_report.pdf).
+
+---
+*Author: Luka Dumbadze*
+EOF
