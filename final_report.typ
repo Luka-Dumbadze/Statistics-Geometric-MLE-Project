@@ -176,89 +176,80 @@ This empirical validation confirms that our theoretical derivation produces a st
 // --- SECTION 4: DATA ANALYSIS ---
 = Data Analysis
 
-== Objective
+// Requirement 1: Data Description
+== 1. Data Description
+    *Data Source:* The dataset `ConcurrentUsers.csv` was obtained from the course materials (TTF 09).
+    *Data Size:* The dataset contains 50 observations ($n=50$).
+    *Variables:*
+    #table(
+      columns: 3,
+      align: (left, left, left),
+      stroke: 0.5pt,
+      [*Variable Name*], [*Type*], [*Role*],
+      [`N` (Users)], [Quantitative (Continuous)], [Response / Outcome ($y$)]
+    )
+    *Note:* As this is a univariate analysis, there are no predictor variables ($x$).
 
-To analyze the `ConcurrentUsers` dataset and perform statistical inference regarding the traffic load on a server.
+// Requirement 2: Goal and Hypothesis
+== 2. Goal and Hypothesis
+The goal of this analysis is to determine if the average server load significantly exceeds a baseline threshold of 15 users.
+    *Statistical Hypothesis:*
+    -   $H_0: mu = 15$ (The mean number of users is 15)
+    -   $H_1: mu > 15$ (The mean number of users is greater than 15)
 
-== Descriptive Statistics & Assumptions
-
-The dataset contains 50 observations of server user counts.
-
+// Requirement 3: Descriptive Statistics & Outliers
+== 3. Descriptive Statistics
+We computed the following summary statistics for the number of users:
 #align(center)[
   #table(
     columns: 2,
-    align: (left, right),
-    stroke: 0.5pt,
-    fill: (col, row) => if row == 0 { rgb("#e8f4f8") },
-    [*Statistic*], [*Value*],
-    [Mean], [17.954],
-    [Standard Deviation], [3.157],
-    [Sample Size], [50],
+    stroke: none,
+    [Mean ($overline(x)$):], [17.95],
+    [Standard Deviation ($s$):], [3.16],
+    [Median:], [17.55],
+    [IQR ($Q_3 - Q_1$):], [4.06]
   )
 ]
-
-=== Normality Assessment
-
-Before performing inference, we checked the normality assumption required for the t-test.
-1. *Shapiro-Wilk Test:* The test yielded a p-value of **0.4787**. Since $p > 0.05$, we fail to reject the null hypothesis of normality.
-2. *Visual Inspection:* The histogram with density overlay (Figure 3, left) and the Q-Q plot (Figure 3, right) both indicate the data follows a normal distribution.
-
-*Conclusion:* The assumptions for the t-test are met.
+    *Outlier Check:* Using the $1.5 times "IQR"$ rule, the bounds are $[9.65, 26.05]$. Since all data points fall within $[11.9, 24.1]$, there are *no outliers*.
+#pagebreak()
+// Requirement 4: Graphical Statistics
+== 4. Graphical Statistics
+The distribution was visualized using a histogram with a density overlay and a Q-Q plot to assess normality.
 
 #figure(
   grid(columns: 2, gutter: 1em,
     image("Distribution_Check.png", width: 100%),
     image("QQ_Plot.png", width: 100%)
   ),
-  caption: [Density Plot (Left) and Q-Q Plot (Right) confirming normality],
-) <fig-normality>
+  caption: [Left: Histogram/Density. Right: Normal Q-Q Plot.],
+)
 
-#pagebreak()
+// Requirement 5: Associations
+== 5. Associations
+As this is a one-sample inference on a single quantitative variable (`Users`), there are no explanatory variables ($x$) to check for associations or correlations.
 
-== Statistical Inference
+// Requirement 6: Model Description
+== 6. Model Description
+We assume the data follows a Normal Distribution: $X_i tilde N(mu, sigma^2)$.
+    *Estimation Method:* We use the Sample Mean ($overline(x)$) as the point estimate for the population mean $mu$.
+    *Validation:* The Shapiro-Wilk test yielded $p = 0.4787$, confirming the normality assumption required for the model.
 
-We performed a one-sample t-test to determine if the average traffic exceeds 15 users.
+// Requirement 7: Results
+== 7. Results
+We performed a one-sample t-test ($alpha=0.05$).
+    *Parameter Estimate ($overline(x)$):* 17.954
+    *Test Statistic:* $t = 6.6159$
+    *Degrees of Freedom:* 49
+    *P-value:* $1.306 times 10^(-8)$
+    *95% Confidence Interval:* $[17.21, infinity)$
 
+// Requirement 8: Interpretation
+== 8. Interpretation
+The p-value is extremely small ($p < 0.001$), which provides strong evidence against the null hypothesis. The 95% confidence interval indicates that we can be 95% confident that the true mean number of concurrent users is at least 17.21.
 
-#block(
-  fill: rgb("#fff9e6"),
-  inset: 12pt,
-  radius: 4pt,
-  width: 100%,
-)[
-  *Hypothesis Test:*
-  
-  - *Null Hypothesis ($H_0$):* $mu = 15$
-  - *Alternative Hypothesis ($H_1$):* $mu > 15$
-  - *Significance Level:* $alpha = 0.05$
-]
+// Requirement 9 & 10 are covered by the Appendix and file submission.
 
-=== Test Results
-
-#align(center)[
-  #table(
-    columns: 2,
-    align: (left, right),
-    stroke: 0.5pt,
-    fill: (col, row) => if row == 0 { rgb("#e8f4f8") },
-    [*Test Component*], [*Value*],
-    [Test Statistic ($t$)], [6.6159],
-    [Degrees of Freedom], [49],
-    [P-value], [$1.306 times 10^(-8)$],
-    [Decision], [Reject $H_0$],
-  )
-]
-
-#block(
-  fill: rgb("#e8f8e8"),
-  inset: 12pt,
-  radius: 4pt,
-  width: 100%,
-)[
-  *Final Conclusion:* Since the p-value is significantly less than $alpha = 0.05$, we **reject the null hypothesis**. There is strong statistical evidence that the average number of concurrent users is greater than 15. The 95% confidence interval indicates that the true mean is at least **17.21**.
-]
-
-#pagebreak()
+#pagebreak()  
 
 // --- APPENDIX ---
 = Appendix: R Code
