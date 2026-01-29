@@ -29,8 +29,8 @@
   #v(1.5cm)
   
   #text(size: 14pt)[
-    *Student:* Luka Dumabdze & Ivane Urjumelashvili\
-    *Date:* January 28, 2026
+    *Student:* Luka Dumbadze & Ivane Urjumelashvili\
+    *Date:* January 29, 2026
   ]
   
   #v(2cm)
@@ -58,7 +58,7 @@
 // --- SECTION 1: INTRODUCTION ---
 = Introduction
 
-This project explores the properties of the *Geometric distribution*, which models the number of Bernoulli trials required to achieve the first success. This distribution is widely applicable in computer science, particularly in modeling network packet delivery, server request handling, and algorithm efficiency.
+This project explores the properties of the *Geometric distribution*, which models the number of Bernoulli trials required to achieve the first success. This distribution is widely applicable in computer science, particularly in modeling network packet delivery and server request handling.
 
 The project consists of three parts:
 
@@ -191,23 +191,26 @@ The dataset contains 50 observations of server user counts.
     stroke: 0.5pt,
     fill: (col, row) => if row == 0 { rgb("#e8f4f8") },
     [*Statistic*], [*Value*],
-    [Mean], [17.95],
-    [Standard Deviation], [3.16],
+    [Mean], [17.954],
+    [Standard Deviation], [3.157],
     [Sample Size], [50],
   )
 ]
 
 === Normality Assessment
 
-Before performing statistical inference, we verified the normality assumption required for the one-sample t-test.
-1. *Visual Inspection:* The histogram with density overlay (*Figure 3*) shows an approximately symmetric, bell-shaped distribution.
-2. *Statistical Test:* The Shapiro-Wilk test yielded a p-value of **0.4787**. Since $p > 0.05$, we fail to reject the null hypothesis of normality.
+Before performing inference, we checked the normality assumption required for the t-test.
+1. *Shapiro-Wilk Test:* The test yielded a p-value of **0.4787**. Since $p > 0.05$, we fail to reject the null hypothesis of normality.
+2. *Visual Inspection:* The histogram with density overlay (Figure 3, left) and the Q-Q plot (Figure 3, right) both indicate the data follows a normal distribution.
 
-*Conclusion:* The data follows a normal distribution, justifying the use of the t-test.
+*Conclusion:* The assumptions for the t-test are met.
 
 #figure(
-  image("Distribution_Check.png", width: 85%),
-  caption: [Distribution of Concurrent Users with Density Curve Overlay],
+  grid(columns: 2, gutter: 1em,
+    image("Distribution_Check.png", width: 100%),
+    image("QQ_Plot.png", width: 100%)
+  ),
+  caption: [Density Plot (Left) and Q-Q Plot (Right) confirming normality],
 ) <fig-normality>
 
 #pagebreak()
@@ -252,7 +255,7 @@ We performed a one-sample t-test to determine if the average traffic exceeds 15 
   radius: 4pt,
   width: 100%,
 )[
-  *Final Conclusion:* Since the p-value is significantly less than $alpha = 0.05$, we **reject the null hypothesis**. There is strong statistical evidence that the average number of concurrent users is significantly greater than 15. The 95% confidence interval suggests the true mean is greater than 17.2.
+  *Final Conclusion:* Since the p-value is significantly less than $alpha = 0.05$, we **reject the null hypothesis**. There is strong statistical evidence that the average number of concurrent users is greater than 15. The 95% confidence interval indicates that the true mean is at least **17.21**.
 ]
 
 #pagebreak()
@@ -260,33 +263,33 @@ We performed a one-sample t-test to determine if the average traffic exceeds 15 
 // --- APPENDIX ---
 = Appendix: R Code
 
-== Part 1: Analytical & Computational (Likelihood)
+== Part 1: Analytical & Computational
 
 ```r
 # --- PART 1: MAXIMUM LIKELIHOOD ESTIMATION (PREMIUM) ---
 
-# 1. Define the Log-Likelihood function for Geometric Distribution
+# 1. Setup Image Export
+png("Rplot01.png", width = 800, height = 600, res = 100)
+
+# 2. Define Log-Likelihood function
 geom_loglik <- function(prob, x) {
   n <- length(x)
-  # Safety check to avoid log(0)
   if (prob <= 0 || prob >= 1) return(-Inf)
   return(n * log(prob) + (sum(x) - n) * log(1 - prob))
 }
 
-# 2. Generate synthetic data for verification
+# 3. Generate synthetic data
 set.seed(123)
 n_samples <- 10
 true_prob <- 0.5
-
-# Note: rgeom counts failures. We add 1 to model 'trials until success'.
 x <- rgeom(n_samples, true_prob) + 1 
 
-# 3. Find the MLE using Computational Optimization
+# 4. Find MLE
 MLE_result <- optimize(f = geom_loglik, interval = c(0.001, 0.999), 
                        x = x, maximum = TRUE)
 estimated_p <- MLE_result$maximum
 
-# 4. Visualization (Code for Figure 1)
+# 5. Visualization
 prob_values <- seq(0.01, 0.99, length = 1000)
 loglik_values <- sapply(prob_values, geom_loglik, x = x)
 
@@ -297,53 +300,50 @@ plot(prob_values, loglik_values, type = "l", lwd = 3, col = "darkblue",
 grid()
 abline(v = estimated_p, col = "red", lwd = 2, lty = 2)
 legend("bottom", 
-       legend = c("Log-Likelihood Curve", paste("Maximum (MLE) =", round(estimated_p, 4))),
-       col = c("darkblue", "red"), lwd = c(3, 2), lty = c(1, 2), bg = "white")
-
-# 5. Verification
-cat("Analytical MLE (1/x_bar):  ", 1/mean(x), "\n")
-cat("Computational MLE (R):     ", estimated_p, "\n")
+       legend = c("Log-Likelihood", paste("MLE =", round(estimated_p, 4))),
+       col = c("darkblue", "red"), lwd = c(3, 2), lty = c(1, 2))
+dev.off()
 ```
 
 #pagebreak()
 
-== Part 2: Simulation (Inverse Transform & Consistency)
+== Part 2: Simulation
 
 ```r
 # --- PART 2: SIMULATION & CONSISTENCY (PREMIUM) ---
 library(ggplot2)
 
-# 1. Define the Inverse Transform Function
+# 1. Define Inverse Transform Function
 sim_geometric_inverse <- function(p, n_sims) {
   U <- runif(n_sims) 
   return(ceiling(log(1 - U) / log(1 - p)))
 }
 
-# 2. Consistency Check (Law of Large Numbers)
+# 2. Consistency Check
 set.seed(123)
 p_true <- 0.25 
-sample_sizes <- seq(10, 5000, by = 10) # From n=10 to n=5000
+sample_sizes <- seq(10, 5000, by = 10)
 estimates <- numeric(length(sample_sizes))
 
-# 3. Run Simulation Loop
+# 3. Run Simulation
 for (i in 1:length(sample_sizes)) {
   n <- sample_sizes[i]
   data <- sim_geometric_inverse(p_true, n)
   estimates[i] <- 1 / mean(data)
 }
 
-# 4. Visualization (Code for Figure 2)
+# 4. Visualization
 conv_data <- data.frame(SampleSize = sample_sizes, Estimate = estimates)
 
 p1 <- ggplot(conv_data, aes(x = SampleSize, y = Estimate)) +
-  geom_line(color = "steelblue", alpha = 0.8, size = 0.8) +
-  geom_hline(yintercept = p_true, color = "red", linetype = "dashed", size = 1) +
+  geom_line(color = "steelblue", alpha = 0.8) +
+  geom_hline(yintercept = p_true, color = "red", linetype = "dashed") +
   labs(title = "Consistency of MLE: Convergence to True Parameter",
        subtitle = paste("True p =", p_true, "| Estimator = 1 / SampleMean"),
-       x = "Sample Size (n)",
-       y = "Estimated Parameter (p)") +
+       x = "Sample Size (n)", y = "Estimated Parameter (p)") +
   theme_minimal()
-print(p1)
+
+ggsave("Convergence.png", p1, width = 8, height = 5)
 ```
 
 #pagebreak()
@@ -351,7 +351,7 @@ print(p1)
 == Part 3: Data Analysis
 
 ```r
-# --- PART 3: ADVANCED DATA ANALYSIS (PREMIUM) ---
+# --- PART 3: ADVANCED DATA ANALYSIS (FINAL) ---
 library(ggplot2)
 
 # 1. Load Data
@@ -362,27 +362,27 @@ concurrent_data <- c(17.2, 22.1, 18.5, 17.2, 18.6, 14.8, 21.7, 15.8, 16.3, 22.8,
                      19.7, 18.7, 17.6, 15.9, 15.2, 17.1, 15.0, 18.8, 21.6, 11.9)
 df <- data.frame(Users = concurrent_data)
 
-# 2. Assumption Checking (Normality)
+# 2. Normality Check (Shapiro + Q-Q Plot)
 shapiro_res <- shapiro.test(concurrent_data)
-print(shapiro_res)
-# Result: p-value = 0.4787 -> Fail to reject Null -> Data is Normal
+# p-value = 0.4787 -> Normal
 
-# 3. Visualization (Code for Figure 3)
+p_qq <- ggplot(df, aes(sample = Users)) +
+  stat_qq(color = "#69b3a2", size = 2) +
+  stat_qq_line(color = "red", linetype = "dashed") +
+  labs(title = "Q-Q Plot: Normality Check") + theme_minimal()
+ggsave("QQ_Plot.png", p_qq, width = 6, height = 5)
+
+# 3. Density Plot
 mean_val <- mean(concurrent_data)
 p2 <- ggplot(df, aes(x = Users)) +
   geom_histogram(aes(y = ..density..), bins = 8, 
-                 fill = "#69b3a2", color = "white", alpha = 0.7) +
+                 fill = "#69b3a2", color = "white") +
   geom_density(color = "#FF6666", size = 1.2) +
-  geom_vline(aes(xintercept = mean_val), color = "blue", linetype = "dashed", size = 1) +
-  labs(title = "Distribution of Concurrent Users",
-       subtitle = paste("Shapiro-Wilk p =", round(shapiro_res$p.value, 3)),
-       x = "Number of Users",
-       y = "Density") +
-  theme_minimal()
-print(p2)
+  geom_vline(aes(xintercept = mean_val), color = "blue", linetype = "dashed") +
+  labs(title = "Distribution of Concurrent Users") + theme_minimal()
+ggsave("Distribution_Check.png", p2, width = 7, height = 5)
 
-# 4. Statistical Inference (t-test)
+# 4. Inference
 t_test_res <- t.test(concurrent_data, mu = 15, alternative = "greater")
 print(t_test_res)
-# Result: p-value < 2.2e-16 -> Reject Null Hypothesis
 ```
