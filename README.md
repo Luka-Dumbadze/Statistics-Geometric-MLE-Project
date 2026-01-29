@@ -1,4 +1,3 @@
-cat > README.md <<EOF
 # Statistical Inference: Geometric Distribution Analysis
 
 ## 📌 Overview
