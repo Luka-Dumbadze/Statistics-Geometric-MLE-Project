@@ -124,7 +124,7 @@ $ hat(p)_("MLE") = n/(sum_(i=1)^n x_i) = 1/overline(x) $
 
 == Estimator Properties (Bias Analysis)
 
-While the estimator $hat(p) = 1\/overline(X)$ is consistent (as shown in the next section), it is important to note that it is a *biased* estimator for small sample sizes. 
+While the estimator $hat(p) = 1 / overline(X)$ is consistent (as shown in the next section), it is important to note that it is a *biased* estimator for small sample sizes. 
 
 This is because the expectation operator is linear, but our estimator is non-linear. Specifically, $E[1/overline(X)] eq 1/E[overline(X)]$. By *Jensen's Inequality*, since the function $f(x) = 1/x$ is convex for $x>0$, we expect $E[hat(p)] > p$. However, as the sample size $n -> infinity$, this bias vanishes, making the estimator *asymptotically unbiased*.
 
